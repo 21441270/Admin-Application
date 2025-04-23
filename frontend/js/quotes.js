@@ -60,12 +60,9 @@ var quotesTemplate = {
             onClick: {
                 "wxi-eye": function(ev, id) { // View Button
                     isEditMode = false;
-                    console.log("View");
-
                     var item = this.getItem(id);
-                    console.log(item);
-                    // Add your view logic here (like opening a modal)
-                    $$("quoteViewForm").setValues({
+
+                    $$("quoteViewWindow").getBody().setValues({
                         id: item.id,
                         first_name: item.first_name,
                         middle_name: item.middle_name,
@@ -74,10 +71,13 @@ var quotesTemplate = {
                         email: item.email,
                         address_line: item.address_line,
                         city: item.city,
-                        postcode: item.postcode
+                        postcode: item.postcode,
+                        description: item.description,
+                        total_amount: item.total_amount,
+                        status: item.status,
+                        completion_date: item.completion_date
                     });
-                
-                    // $$("quoteWindow").getHead().setHTML("View Quote"); // Optional: change modal title
+
                     $$("quoteViewWindow").show();
                 },
                 "wxi-pencil": function(ev, id) { // Edit Button
@@ -331,44 +331,47 @@ webix.ui({
     view: "window",
     id: "quoteViewWindow",
     head: "Quote Details",
-    width: 550,
-    height: 350,
+    width: 725,
+    height: 750,
     position: "center",
     modal: true,
     close: true,
     body: {
-        rows: [
+        view: "form",
+        // scroll: true,
+        elementsConfig: {
+            labelWidth: 180 // Increase width for all labels
+            
+        },
+        elements: [
             {
-                view: "property",
-                id: "quoteViewForm",
-                editable: false,
-                nameWidth: 250,
-                elements: [
-                    // { label:"Quote Name", type:"label", align:"center"  }, // CONFIRM
-                    { label: "First Name", id: "first_name" },
-                    { label: "Middle Name", id: "middle_name" },
-                    { label: "Last Name", id: "last_name" },
-                    // { label:"Quote Contact", type:"label" }, // CONFIRM
-                    { label: "Contact Number", id: "contact_number" },
-                    { label: "Email", id: "email" },
-                    // { label:"Quote Address", type:"label" }, // CONFIRM
-                    { label: "Address", id: "address_line" },
-                    { label: "City", id: "city" },
-                    { label: "Postcode", id: "postcode" }
-                ]
+                view: "fieldset",
+                label: "Quote Details",
+                body: {
+                    rows: [
+                        { view: "text", label: "Quote ID", name: "id", readonly: true },
+                        { view: "text", label: "Project Description", name: "description", readonly: true },
+                        { view: "text", label: "Total Amount", name: "total_amount", readonly: true },
+                        { view: "text", label: "Status", name: "status", readonly: true },
+                        { view: "text", label: "Expected Completion Date", name: "completion_date", readonly: true }
+                    ]
+                }
             },
             {
-                cols: [
-                    {},
-                    {
-                        view: "button",
-                        value: "Close",
-                        width: 100,
-                        click: function () {
-                            $$("quoteViewWindow").hide();
-                        }
-                    }
-                ]
+                view: "fieldset",
+                label: "Client Details",
+                body: {
+                    rows: [
+                        { view: "text", label: "First Name", name: "first_name", readonly: true },
+                        { view: "text", label: "Middle Name", name: "middle_name", readonly: true },
+                        { view: "text", label: "Last Name", name: "last_name", readonly: true },
+                        { view: "text", label: "Contact Number", name: "contact_number", readonly: true },
+                        { view: "text", label: "Email", name: "email", readonly: true },
+                        { view: "textarea", label: "Address Line", name: "address_line", readonly: true },
+                        { view: "text", label: "City", name: "city", readonly: true },
+                        { view: "text", label: "Postcode", name: "postcode", readonly: true }
+                    ]
+                }
             }
         ]
     }
