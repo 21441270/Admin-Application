@@ -164,8 +164,8 @@ webix.ui({
     view: "window",
     id: "quoteWindow",
     head: "Quote Information",
-    width: 550,
-    height: 750,
+    width: 725,
+    height: 900,
     position: "center",
     modal: true,
     close: true,
@@ -173,96 +173,111 @@ webix.ui({
         view: "form",
         id: "quoteForm",
         elementsConfig: {
-            labelWidth: 150,
+            labelWidth: 180,
             bottomPadding: 18
         },
         rules: {
-            "first_name": webix.rules.isNotEmpty,
-            "last_name": webix.rules.isNotEmpty,
-            "contact_number": function(value) {
-                return webix.rules.isNotEmpty(value) && webix.rules.isNumber(value);
+            "description": webix.rules.isNotEmpty,
+            "total_amount": function(value) {
+                return !isNaN(value) && parseFloat(value) >= 0;
             },
-            "email": webix.rules.isEmail,
-            "address_line": webix.rules.isNotEmpty,
-            "city": webix.rules.isNotEmpty,
-            "postcode": webix.rules.isNotEmpty
-        }
-        ,
+            "status": webix.rules.isNotEmpty,
+            "completion_date": webix.rules.isNotEmpty,
+            "client_id": webix.rules.isNotEmpty
+        },
         elements: [
             {
-                view: "text",
-                label: "First Name",
-                name: "first_name",
-                invalidMessage: "First name is required"
+                view: "fieldset",
+                label: "Quote Details",
+                body: {
+                    rows: [
+                        { view: "text", label: "Project Description", name: "description", invalidMessage: "Project description is required" },
+                        { view: "text", label: "Total Amount", name: "total_amount", invalidMessage: "Please enter a valid amount" },
+                        {
+                            view: "combo",
+                            label: "Status",
+                            name: "status",
+                            options: ["Pending", "In Progress", "Completed"],
+                            invalidMessage: "Status is required"
+                        },
+                        {
+                            view: "datepicker",
+                            label: "Expected Completion Date",
+                            name: "completion_date",
+                            stringResult: true,
+                            format: "%Y-%m-%d",
+                            invalidMessage: "Date is required"
+                        }
+                    ]
+                }
             },
             {
-                view: "text",
-                label: "Middle Name",
-                name: "middle_name"
+                view: "fieldset",
+                label: "Client Details",
+                body: {
+                    rows: [   
+                        {
+                            view: "combo",
+                            label: "Client Name",
+                            name: "client_id",
+                            id: "clientSelector",
+                            options: {
+                                body: {
+                                    url: "http://localhost:8000/backend/clients.php",
+                                    template: "#name#"
+                                }
+                            },
+                            invalidMessage: "Client name is required",
+                            on: {
+                                onChange: function (newValue) {
+                                    const list = this.getPopup().getList();
+                                    const clientData = list.getItem(newValue);
+                        
+                                    if (clientData) {
+                                        // Auto-fill the form with client data
+                                        $$("quoteForm").setValues({
+                                            contact_number: clientData.contact_number,
+                                            email: clientData.email,
+                                            address_line: clientData.address_line,
+                                            city: clientData.city,
+                                            postcode: clientData.postcode
+                                        }, true);
+                        
+                                        // Prevent further typing
+                                        this.getInputNode().setAttribute("readonly", true);
+                                    }
+                                }
+                            }
+                        },                                                 
+                        { view: "text", label: "Contact Number", name: "contact_number", invalidMessage: "Contact number is required and must be numeric", readonly: true  },
+                        { view: "text", label: "Email", name: "email", invalidMessage: "Please enter a valid email address", readonly: true  },
+                        { view: "textarea", label: "Address Line", name: "address_line", invalidMessage: "Address is required", readonly: true  },
+                        { view: "text", label: "City", name: "city", invalidMessage: "City is required", readonly: true  },
+                        { view: "text", label: "Postcode", name: "postcode", invalidMessage: "Postcode is required", readonly: true  }
+                    ]
+                }
             },
             {
-                view: "text",
-                label: "Last Name",
-                name: "last_name",
-                invalidMessage: "Last name is required"
-            },
-            {
-                view: "text",
-                label: "Contact Number",
-                name: "contact_number",
-                invalidMessage: "Contact number is required and must be numeric"
-            },
-            {
-                view: "text",
-                label: "Email",
-                name: "email",
-                invalidMessage: "Please enter a valid email address"
-            },
-            {
-                view: "textarea",
-                label: "Address Line",
-                name: "address_line",
-                invalidMessage: "Address is required"
-            },
-            {
-                view: "text",
-                label: "City",
-                name: "city",
-                invalidMessage: "City is required"
-            },
-            {
-                view: "text",
-                label: "Postcode",
-                name: "postcode",
-                invalidMessage: "Postcode is required"
-            },
-            {
-                margin: 5,
+                margin: 10,
                 cols: [
                     {},
-                    { 
+                    {
                         view: "button",
                         id: "saveQuoteBtn",
                         value: "Save Quote",
                         width: 150,
+                        css: "webix_primary",
                         click: function () {
                             const form = $$("quoteForm");
                             if (form.validate()) {
                                 const formData = form.getValues();
-                                console.log("Validated Data:", formData);
-                        
                                 if (isEditMode) {
-                                    console.log("IS isEditMode")
-                                    updateQuote()
+                                    updateQuote();
                                 } else {
-                                    console.log("NOT isEditMode")
-                                    addQuote()
+                                    addQuote();
                                 }
-                                this.getTopParentView().hide(); // hide window
-                            
-                        
+                                this.getTopParentView().hide();
                             } else {
-                                console.log("invalidate")
                                 webix.message({ type: "error", text: "Please fill in all required fields correctly." });
                             }
                         }
@@ -272,6 +287,7 @@ webix.ui({
         ]
     }
 });
+
 
 
 
