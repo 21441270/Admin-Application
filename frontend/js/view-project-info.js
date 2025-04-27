@@ -133,23 +133,11 @@ var viewProjectInfoTemplate = {
                 {
                     rows: [
                         { template: "Quote Summary", type: "section" },
-                        /* {
-                            view: "datatable",
-                            id: "quote_table",
-                            scrollX: false,
-                            columns: [
-                                { id: "quote_id", header: "Quote ID", width: 100 },
-                                { id: "quote_description", header: "Description", fillspace: true },
-                                { id: "quote_amount", header: "Amount", width: 150, format: webix.i18n.priceFormat },
-                                { id: "created_at", header: "Created Date", width: 180 }
-                            ],
-                            footer: true
-                        }, */
                         {
                             view: "datatable",
                             id: "quote_table",
                             scrollX: false,
-                            footer: true, // 👈 Enable the footer
+                            footer: true,
                             columns: [
                                 { id: "quote_id", header: "Quote ID", width: 100 },
                                 { id: "quote_description", header: "Description", fillspace: true },
@@ -181,7 +169,7 @@ webix.ui.datafilter.summColumn = webix.extend({
             summ += parseFloat(obj[value.columnId]) || 0;
         });
         node.innerHTML = "Total: " + webix.i18n.priceFormat(summ);
-        node.style.textAlign = "right"; // This will float the text to the right
+        node.style.textAlign = "right";
     
     }
 }, webix.ui.datafilter.summColumn);
