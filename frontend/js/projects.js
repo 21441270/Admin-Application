@@ -60,11 +60,67 @@ var projectsTemplate = {
                 }
             },
             onClick: {
-                "wxi-eye": function(ev, id) {
-                    isEditMode = false;
-                    var item = this.getItem(id);
-                    $$("projectViewForm").setValues(item);
-                    $$("projectViewWindow").show();
+                "wxi-eye": function (ev, id) {
+                    const item = this.getItem(id); // get the clicked item (row)
+
+                    // Send project_id to PHP script
+                    webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: item.project_id })
+                    .then(function(response) {
+                        console.log("response")
+                        console.log(response)
+                        const data = response.json(); // the JSON object sent back from PHP
+                        console.log("data")
+                        console.log(data)
+
+                        webix.require("js/view-project-info.js", function () {
+                            const pageContent = $$("pageContent");
+    
+                            // Remove existing view if any
+                            if (pageContent.getChildViews().length > 0) {
+                                pageContent.removeView(pageContent.getChildViews()[0]);
+                            }
+    
+                            // Add the new view
+                            pageContent.addView(viewProjectInfoTemplate);
+    
+                            // Pass the data to the view (customize this as needed)
+                            console.log($$("viewProjectInfoForm"))
+                            console.log(data)
+                            /* if ($$("viewProjectInfoForm")) {
+                                $$("viewProjectInfoForm").setValues(data);
+                            } */
+                                $$("projectOverview").setValues({
+                                    "project_name": data.project_name,
+                                    "status": data.status,
+                                    "start_date": data.start_date,
+                                    "expected_completion": data.expected_completion
+                                });
+                
+                                $$("clientDetails").setValues({
+                                    "client_name": data.client_name,
+                                    "client_email": data.client_email,
+                                    "client_phone": data.client_phone,
+                                    "client_address": data.client_address
+                                });
+
+                                $$("description").setValue(data.project_description);
+                                $$("project_value").setValue(data.project_value);
+                                $$("project_manager").setValue(data.project_manager);
+                                $$("role").setValue(data.role);
+                                $$("staff_contact").setValue(data.staff_contact);
+                                $$("staff_email").setValue(data.staff_email);
+
+                                $$("quote_table").clearAll();
+                                $$("quote_table").parse(data.quotes); 
+                                console.log(data.quotes)
+
+
+
+                        });
+                    })
+                    .catch(function(err) {
+                        console.error("Error loading project details:", err);
+                    });
                 },
                 "wxi-pencil": function(ev, id) {
                     isEditMode = true;
@@ -232,7 +288,7 @@ function updateProject() {
     }
 }
 
-webix.ui({
+/* webix.ui({
     view: "window",
     id: "projectViewWindow",
     head: "Project Details",
@@ -275,3 +331,4 @@ webix.ui({
         ]
     }
 });
+ */
