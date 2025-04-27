@@ -66,11 +66,7 @@ var projectsTemplate = {
                     // Send project_id to PHP script
                     webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: item.project_id })
                     .then(function(response) {
-                        console.log("response")
-                        console.log(response)
                         const data = response.json(); // the JSON object sent back from PHP
-                        console.log("data")
-                        console.log(data)
 
                         webix.require("js/view-project-info.js", function () {
                             const pageContent = $$("pageContent");
@@ -82,13 +78,6 @@ var projectsTemplate = {
     
                             // Add the new view
                             pageContent.addView(viewProjectInfoTemplate);
-    
-                            // Pass the data to the view (customize this as needed)
-                            console.log($$("viewProjectInfoForm"))
-                            console.log(data)
-                            /* if ($$("viewProjectInfoForm")) {
-                                $$("viewProjectInfoForm").setValues(data);
-                            } */
                                 $$("projectOverview").setValues({
                                     "project_name": data.project_name,
                                     "status": data.status,
@@ -112,10 +101,6 @@ var projectsTemplate = {
 
                                 $$("quote_table").clearAll();
                                 $$("quote_table").parse(data.quotes); 
-                                console.log(data.quotes)
-
-
-
                         });
                     })
                     .catch(function(err) {
