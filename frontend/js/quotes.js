@@ -58,27 +58,59 @@ var quotesTemplate = {
                 }
             },
             onClick: {
-                "wxi-eye": function(ev, id) { // View Button
-                    isEditMode = false;
-                    var item = this.getItem(id);
+                "wxi-eye": function (ev, id) {
+                    const item = this.getItem(id); // get the clicked item (row)
 
-                    $$("quoteViewWindow").getBody().setValues({
-                        id: item.id,
-                        first_name: item.first_name,
-                        middle_name: item.middle_name,
-                        last_name: item.last_name,
-                        contact_number: item.contact_number,
-                        email: item.email,
-                        address_line: item.address_line,
-                        city: item.city,
-                        postcode: item.postcode,
-                        description: item.description,
-                        total_amount: item.total_amount,
-                        status: item.status,
-                        completion_date: item.completion_date
+                    // Send project_id to PHP script
+                    webix.ajax().post("http://localhost:8000/backend/quote_info_details.php", { quote_id: item.id })
+                    .then(function(response) {
+                        const data = response.json()
+                        
+                        webix.require("js/view-quote-info.js", function () {
+                            const pageContent = $$("pageContent");
+    
+                            // Remove existing view if any
+                            if (pageContent.getChildViews().length > 0) {
+                                pageContent.removeView(pageContent.getChildViews()[0]);
+                            }
+    
+                            // Add the new view
+                            pageContent.addView(viewQuoteInfoTemplate);
+
+                             // Show loading overlay while the data is being processed
+                            $$("requirement_table").showOverlay("Loading...");
+
+                                $$("quoteDetails").setValues({
+                                    "id": data.quote_id,
+                                    "description": data.quote_description,
+                                    "total_amount": data.total_amount,
+                                    "status": data.project_status,
+                                    "start_date": data.project_start_date,
+                                    "completion_date": data.project_completion_date
+                                })
+        
+                                $$("clientDetails").setValues({
+                                    "client_name": data.client_name,
+                                    "client_number": data.client_number,
+                                    "email": data.client_email,
+                                    "address": data.client_address
+                                });
+                                $$("requirement_table").parse(data.requirements); 
+
+                                // Hide loading overlay once data is loaded
+                                $$("requirement_table").hideOverlay();
+
+                                // Check if requirements are empty and show overlay if so
+                                if (data.requirements.length === 0) {
+                                    $$("requirement_table").showOverlay("No Requirements Found");
+                                } else {
+                                    $$("requirement_table").hideOverlay();
+                                }
+                        });
+                    })
+                    .catch(function(err) {
+                        console.error("Error loading project details:", err);
                     });
-
-                    $$("quoteViewWindow").show();
                 },
                 "wxi-pencil": function(ev, id) { // Edit Button
                     isEditMode = true;
