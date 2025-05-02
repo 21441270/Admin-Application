@@ -5,7 +5,7 @@ var addQuoteTemplate = {
             view: "toolbar",
             height: 60,
             elements: [
-                { view: "label", label: "Quote Information", align: "left", css: "header_label" },
+                { view: "label", label: "Add Quote", align: "left", css: "header_label" },
                 {},
                 {
                     view: "button",
