@@ -1,3 +1,5 @@
+var originalProjectData = {};
+
 var viewProjectInfoTemplate = {
     rows: [
         {
@@ -8,22 +10,110 @@ var viewProjectInfoTemplate = {
                 {},
                 {
                     view: "button",
+                    id: "editProjectBtn",
                     label: "Edit Project",
                     width: 130,
                     click: function () {
-                        $$("projectOverview").enable();
-                        $$("clientDetails").enable();
-                        $$("description").enable();
-                        $$("project_value").enable();
-                        $$("project_manager").enable();
-                        $$("role").enable();
-                        $$("staff_contact").enable();
-                        $$("staff_email").enable();
+                        // Store current values
+                        /* originalProjectData = {
+                            projectOverview: webix.copy($$("projectOverview").getValues()),
+                            clientDetails: webix.copy($$("clientDetails").getValues()),
+                            description: $$("description").getValue(),
+                            project_value: $$("project_value").getValue(),
+                            project_manager: $$("project_manager").getValue(),
+                            role: $$("role").getValue(),
+                            staff_contact: $$("staff_contact").getValue(),
+                            staff_email: $$("staff_email").getValue()
+                        }; */
+
+                        originalProjectData = {
+                            projectOverview: webix.copy($$("projectOverview").getValues()),
+                            clientDetails: webix.copy($$("clientDetails").getValues()),
+                            description: $$("description").getValue(),
+                            project_value: $$("project_value").getValue(),
+                            project_manager: $$("project_manager").getValue(),
+                            role: $$("role").getValue(),
+                            staff_contact: $$("staff_contact").getValue(),
+                            staff_email: $$("staff_email").getValue()
+                        }
+                        console.log(originalProjectData)
+
+                        $$("projectOverview").define("editable", true); $$("projectOverview").refresh();
+                        $$("clientDetails").define("editable", true); $$("clientDetails").refresh();
+
+                        ["description", "project_value", "project_manager", "role", "staff_contact", "staff_email"].forEach(id => {
+                            $$(id).define("readonly", false);
+                            $$(id).refresh();
+                        });
+
+                        $$("editProjectBtn").hide();
+                        $$("addQuoteBtn").hide();
+                        $$("backBtn").hide();
+                        $$("cancelEditBtn").show();
                         $$("footerToolbar").show();
                     }
                 },
                 {
                     view: "button",
+                    id: "cancelEditBtn",
+                    label: "Cancel",
+                    width: 130,
+                    hidden: true,
+                    click: function () {
+                        
+                        console.log(originalProjectData)
+                        // Restore original values
+
+                        console.log($$("projectOverview").getValues())
+                        console.log($$("clientDetails").getValues())
+
+                        // $$("projectOverview").setValues(originalProjectData.projectOverview);
+
+                        $$("projectOverview").setValues({
+                            "project_name": originalProjectData.projectOverview.project_name,
+                            "status": originalProjectData.projectOverview.status,
+                            "start_date": originalProjectData.projectOverview.start_date,
+                            "expected_completion": originalProjectData.projectOverview.expected_completion
+                        });
+        
+                        $$("clientDetails").setValues({
+                            "client_name": originalProjectData.clientDetails.client_name,
+                            "client_email": originalProjectData.clientDetails.client_email,
+                            "client_phone": originalProjectData.clientDetails.client_phone,
+                            "client_address": originalProjectData.clientDetails.client_address
+                        });
+
+
+
+
+                       // $$("clientDetails").setValues(originalProjectData.clientDetails);
+                        $$("description").setValue(originalProjectData.description);
+                        $$("project_value").setValue(originalProjectData.project_value);
+                        $$("project_manager").setValue(originalProjectData.project_manager);
+                        $$("role").setValue(originalProjectData.role);
+                        $$("staff_contact").setValue(originalProjectData.staff_contact);
+                        $$("staff_email").setValue(originalProjectData.staff_email);
+
+                        $$("projectOverview").define("editable", false); $$("projectOverview").refresh();
+                        $$("clientDetails").define("editable", false); $$("clientDetails").refresh();
+
+                        ["description", "project_value", "project_manager", "role", "staff_contact", "staff_email"].forEach(id => {
+                            $$(id).define("readonly", true);
+                            $$(id).refresh();
+                        });
+
+                        $$("editProjectBtn").show();
+                        $$("addQuoteBtn").show();
+                        $$("backBtn").show();
+                        $$("cancelEditBtn").hide();
+                        $$("footerToolbar").hide();
+
+                        webix.message("Changes discarded");
+                    }
+                },
+                {
+                    view: "button",
+                    id: "addQuoteBtn",
                     label: "Add Quote",
                     type: "form",
                     width: 130,
@@ -40,6 +130,7 @@ var viewProjectInfoTemplate = {
                 },
                 {
                     view: "button",
+                    id: "backBtn",
                     label: "Back",
                     css: "webix_primary",
                     width: 100,
@@ -57,9 +148,6 @@ var viewProjectInfoTemplate = {
             view: "form",
             id: "viewProjectInfoForm",
             scroll: true,
-            elementsConfig: {
-                disabled: true
-            },
             elements: [
                 {
                     cols: [
@@ -69,7 +157,7 @@ var viewProjectInfoTemplate = {
                                 {
                                     view: "property",
                                     id: "projectOverview",
-                                    disabled: true,
+                                    editable: false,
                                     height: 110,
                                     elements: [
                                         { label: "Project Name", type: "text", id: "project_name" },
@@ -87,7 +175,7 @@ var viewProjectInfoTemplate = {
                                 {
                                     view: "property",
                                     id: "clientDetails",
-                                    disabled: true,
+                                    editable: false,
                                     height: 110,
                                     elements: [
                                         { label: "Name", type: "text", id: "client_name" },
@@ -107,6 +195,7 @@ var viewProjectInfoTemplate = {
                         {
                             view: "textarea",
                             id: "description",
+                            readonly: true,
                             label: "Description",
                             height: 80,
                             labelWidth: 150
@@ -114,6 +203,7 @@ var viewProjectInfoTemplate = {
                         {
                             view: "text",
                             id: "project_value",
+                            readonly: true,
                             label: "Project Value",
                             labelWidth: 150
                         }
@@ -128,6 +218,7 @@ var viewProjectInfoTemplate = {
                                 {
                                     view: "text",
                                     id: "project_manager",
+                                    readonly: true,
                                     label: "Name",
                                     labelWidth: 150
                                 },
@@ -135,6 +226,7 @@ var viewProjectInfoTemplate = {
                                 {
                                     view: "text",
                                     id: "role",
+                                    readonly: true,
                                     label: "Site Role",
                                     labelWidth: 150
                                 }
@@ -145,6 +237,7 @@ var viewProjectInfoTemplate = {
                                 {
                                     view: "text",
                                     id: "staff_contact",
+                                    readonly: true,
                                     label: "Contact Number",
                                     labelWidth: 150
                                 },
@@ -152,6 +245,7 @@ var viewProjectInfoTemplate = {
                                 {
                                     view: "text",
                                     id: "staff_email",
+                                    readonly: true,
                                     label: "Email",
                                     labelWidth: 150
                                 }
@@ -203,18 +297,22 @@ var viewProjectInfoTemplate = {
                     width: 120,
                     css: "webix_primary",
                     click: function () {
-                        webix.message("Project saved!");
+                        // Disable editing
+                        $$("projectOverview").define("editable", false); $$("projectOverview").refresh();
+                        $$("clientDetails").define("editable", false); $$("clientDetails").refresh();
 
-                        $$("projectOverview").disable();
-                        $$("clientDetails").disable();
-                        $$("description").disable();
-                        $$("project_value").disable();
-                        $$("project_manager").disable();
-                        $$("role").disable();
-                        $$("staff_contact").disable();
-                        $$("staff_email").disable();
+                        ["description", "project_value", "project_manager", "role", "staff_contact", "staff_email"].forEach(id => {
+                            $$(id).define("readonly", true);
+                            $$(id).refresh();
+                        });
 
+                        $$("editProjectBtn").show();
+                        $$("addQuoteBtn").show();
+                        $$("backBtn").show();
+                        $$("cancelEditBtn").hide();
                         $$("footerToolbar").hide();
+
+                        webix.message("Project saved!");
                     }
                 }
             ]
