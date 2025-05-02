@@ -198,7 +198,7 @@ var viewProjectInfoTemplate = {
                 {},
                 {
                     view: "button",
-                    id: "saveProjectBtn",
+                    id: "saveBtn",
                     value: "Save",
                     width: 120,
                     css: "webix_primary",
@@ -216,8 +216,7 @@ var viewProjectInfoTemplate = {
 
                         $$("footerToolbar").hide();
                     }
-                },
-                {}
+                }
             ]
         }
     ]
