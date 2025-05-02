@@ -1,6 +1,6 @@
 var menu_options  = [
   {id: "1", icon: "mdi mdi-home", value:"Dashboard"},
-  {id: "2", icon: "mdi mdi-file-document", value:"Quote Management"},
+  // {id: "2", icon: "mdi mdi-file-document", value:"Quote Management"},
   {id: "3", icon: "mdi mdi-folder", value:"Projects"},
   {id: "4", icon: "mdi mdi-account", value:"Clients"}
 ];
