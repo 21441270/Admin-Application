@@ -82,7 +82,7 @@ var projectsTemplate = {
                                     "project_name": data.project_name,
                                     "status": data.status,
                                     "start_date": data.start_date,
-                                    "expected_completion": data.expected_completion
+                                    "expected_completion": data.expected_completion_date
                                 });
                 
                                 $$("clientDetails").setValues({
