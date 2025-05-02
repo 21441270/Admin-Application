@@ -17,8 +17,15 @@ var projectsTemplate = {
                     css: "webix_primary",
                     click: function () {
                         isEditMode = false;
-                        $$("projectForm").clear();
-                        $$("projectWindow").show();
+                        /* $$("projectForm").clear();
+                        $$("projectWindow").show(); */
+                        webix.require("js/add-project.js", function () {
+                            const pageContent = $$("pageContent");
+                            if (pageContent.getChildViews().length > 0) {
+                                pageContent.removeView(pageContent.getChildViews()[0]);
+                            }
+                            pageContent.addView(addProjectTemplate);
+                        });
                     }
                 }
             ]
