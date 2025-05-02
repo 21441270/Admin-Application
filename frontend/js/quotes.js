@@ -18,8 +18,19 @@ var quotesTemplate = {
                     css: "webix_primary",
                     click: function () {
                         isEditMode = false;
-                        $$("quoteForm").clear();
-                        $$("quoteWindow").show();
+                        // $$("quoteForm").clear();
+                        // $$("quoteWindow").show();
+
+
+                        webix.require("js/add-quote.js", function () {
+                            const pageContent = $$("pageContent");
+                            if (pageContent.getChildViews().length > 0) {
+                                pageContent.removeView(pageContent.getChildViews()[0]);
+                            }
+    
+                            pageContent.addView(addQuoteTemplate);
+                        });
+
                     }
                 }
             ]
@@ -192,7 +203,7 @@ var quotesTemplate = {
     ]
 };
 
-webix.ui({
+/* webix.ui({
     view: "window",
     id: "quoteWindow",
     head: "Quote Information",
@@ -318,109 +329,6 @@ webix.ui({
             }
         ]
     }
-});
+}); */
 
 
-
-
-function addQuote() {
-    const form = $$("quoteForm");
-	if (form.validate()) {
-		var formData = form.getValues();
-        console.log("ADDDDDD Validated Data:", formData)
-    
-        webix.ajax().post("http://localhost:8000/backend/quotes.php", formData)
-        .then(function (response) {
-            webix.message("Quote added successfully!");
-            $$("quoteWindow").hide();
-            form.clear();
-            $$("quotesTable").clearAll();
-            $$("quotesTable").load("http://localhost:8000/backend/quotes.php");
-        })
-        .catch(function (err) {
-            webix.message({ type: "error", text: "Failed to add quote" });
-            console.error("Error:", err);
-        });
-
-    } else {
-        console.log("invalidate")
-        webix.message({ type: "error", text: "Please fill in all required fields correctly." });
-    }
-}
-
-function updateQuote() {
-    const form = $$("quoteForm");
-
-	if (form.validate()) {
-		var formData = form.getValues();
-        console.log("UPDATE QUOTE DATA:", formData);
-        webix.ajax().put("http://localhost:8000/backend/quotes.php", formData)
-        .then(function (response) {
-            webix.message("Quote updated successfully!");
-            $$("quoteWindow").hide();
-            form.clear();
-            $$("quotesTable").clearAll();
-            $$("quotesTable").load("http://localhost:8000/backend/quotes.php");
-        })
-        .catch(function (err) {
-            webix.message({ type: "error", text: "Failed to update quote" });
-            console.error("Error:", err);
-        });
-
-
-    } else {
-        console.log("invalidate")
-        webix.message({ type: "error", text: "Please fill in all required fields correctly." });
-    }
-}
-
-// View Quote Info
-webix.ui({
-    view: "window",
-    id: "quoteViewWindow",
-    head: "Quote Details",
-    width: 725,
-    height: 750,
-    position: "center",
-    modal: true,
-    close: true,
-    body: {
-        view: "form",
-        // scroll: true,
-        elementsConfig: {
-            labelWidth: 180 // Increase width for all labels
-            
-        },
-        elements: [
-            {
-                view: "fieldset",
-                label: "Quote Details",
-                body: {
-                    rows: [
-                        { view: "text", label: "Quote ID", name: "id", readonly: true },
-                        { view: "text", label: "Project Description", name: "description", readonly: true },
-                        { view: "text", label: "Total Amount", name: "total_amount", readonly: true },
-                        { view: "text", label: "Status", name: "status", readonly: true },
-                        { view: "text", label: "Expected Completion Date", name: "completion_date", readonly: true }
-                    ]
-                }
-            },
-            {
-                view: "fieldset",
-                label: "Client Details",
-                body: {
-                    rows: [
-                        { view: "text", label: "First Name", name: "first_name", readonly: true },
-                        { view: "text", label: "Middle Name", name: "middle_name", readonly: true },
-                        { view: "text", label: "Last Name", name: "last_name", readonly: true },
-                        { view: "text", label: "Contact Number", name: "contact_number", readonly: true },
-                        { view: "text", label: "Email", name: "email", readonly: true },
-                        { view: "textarea", label: "Address Line", name: "address_line", readonly: true },
-                        { view: "text", label: "City", name: "city", readonly: true },
-                        { view: "text", label: "Postcode", name: "postcode", readonly: true }
-                    ]
-                }
-            }
-        ]
-    }
-});
