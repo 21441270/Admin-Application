@@ -18,12 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             projects.project_value AS project_value,
             
             -- Client Details
+            clients.id AS client_id,
             CONCAT(clients.first_name, ' ', IFNULL(clients.middle_name, ''), ' ', clients.last_name) AS client_name,
             clients.email AS client_email,
             clients.contact_number AS client_phone,
             CONCAT(clients.address_line, ', ', clients.city, ', ', clients.postcode) AS client_address,
             
             -- Project Team
+            staff.id AS staff_id,
             CONCAT(staff.first_name, ' ', IFNULL(staff.middle_name, ''), ' ', staff.last_name) AS project_manager,
             staff.role AS role,
             staff.contact_number AS staff_contact,
