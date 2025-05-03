@@ -12,47 +12,69 @@ var addProjectTemplate = {
                     label: "Back",
                     width: 100,
                     click: function () {
-                        webix.require("js/projects.js", function () {
-                            const pageContent = $$("pageContent");
-                            pageContent.removeView(pageContent.getChildViews()[0]);
-                            pageContent.addView(projectsTemplate);
+                        webix.confirm({
+                            title: "Confirm Navigation",
+                            text: "Are you sure you want to leave this page and return to the project list?",
+                            type: "confirm-warning"
+                        }).then(function () {
+                            webix.require("js/projects.js", function () {
+                                const pageContent = $$("pageContent");
+                                pageContent.removeView(pageContent.getChildViews()[0]);
+                                pageContent.addView(projectsTemplate);
+                            });
                         });
                     }
                 }
+                
             ]
         },
         {
             view: "form",
             id: "addProjectForm",
             scroll: "y",
-            // gravity: 1, 
             elementsConfig: {
                 labelWidth: 180,
                 bottomPadding: 18
             },
             rules: {
-                "client_id": webix.rules.isNotEmpty,
-                "quote_description": webix.rules.isNotEmpty
+                "project_name": webix.rules.isNotEmpty,
+                "project_description": webix.rules.isNotEmpty,
+                "project_value": webix.rules.isNotEmpty,
+                "project_status": webix.rules.isNotEmpty,
+                "project_start_date": webix.rules.isNotEmpty,
+                "project_completion_date": webix.rules.isNotEmpty,
+                "client_name": webix.rules.isNotEmpty,
+                "staff_name": webix.rules.isNotEmpty
             },
             elements: [
                 {
                     rows: [
                         { template: "Project Details", type: "section" },
-                        { view: "text", label: "Project Name", name: "project_name"},
-                        { view: "text", label: "Project Description", name: "project_description" },
-                        { view: "text", label: "Project Value", name: "project_value" },
+                        { view: "text", label: "Project Name", name: "project_name", invalidMessage: "Project name is required" },
+                        { view: "text", label: "Project Description", name: "project_description", invalidMessage: "Description is required" },
+                        { view: "text", label: "Project Value", name: "project_value", invalidMessage: "Value is required" },
                         {
                             view: "combo",
                             label: "Status",
                             name: "project_status",
-                            options: ["Pending", "In Progress", "Completed"]
+                            options: ["Pending", "In Progress", "Completed"],
+                            invalidMessage: "Status is required"
+                        },
+                        {
+                            view: "datepicker",
+                            label: "Start Date",
+                            name: "project_start_date",
+                            stringResult: true,
+                            format: "%Y-%m-%d",
+                            invalidMessage: "Start date is required"
                         },
                         {
                             view: "datepicker",
                             label: "Expected Completion Date",
                             name: "project_completion_date",
                             stringResult: true,
-                            format: "%Y-%m-%d"
+                            format: "%Y-%m-%d",
+                            invalidMessage: "Completion date is required"
                         }
                     ]
                 },
@@ -62,13 +84,13 @@ var addProjectTemplate = {
                         { template: "Client Information", type: "section" },
                         {
                             view: "combo",
-                            label: "Client ID",
-                            name: "client_id",
+                            label: "Client Name",
+                            name: "client_name",
                             id: "clientSelector",
                             options: {
                                 body: {
                                     url: "http://localhost:8000/backend/clients.php",
-                                    template: "#id#"
+                                    template: "#name#"
                                 }
                             },
                             invalidMessage: "Client name is required",
@@ -76,15 +98,11 @@ var addProjectTemplate = {
                                 onChange: function (newValue) {
                                     const list = this.getPopup().getList();
                                     const clientData = list.getItem(newValue);
-                                    console.log(list)
-                                    console.log(clientData)
-
-                                    console.log(clientData)
                         
                                     if (clientData) {
                                         // Auto-fill the form with client data
                                         $$("addProjectForm").setValues({
-                                            client_name: clientData.name,
+                                            client_id: clientData.id,
                                             client_email: clientData.email,
                                             client_contact_number: clientData.contact_number,
                                             client_address: clientData.address
@@ -95,8 +113,7 @@ var addProjectTemplate = {
                                     }
                                 }
                             }
-                        },  
-                        { view: "text", label: "Client Name", name: "client_name", disabled:true },
+                        },
                         { view: "text", label: "Email", name: "client_email", disabled:true },
                         { view: "text", label: "Contact Number", name: "client_contact_number", disabled:true },
                         { view: "text", label: "Address", name: "client_address", disabled:true },
@@ -118,19 +135,16 @@ var addProjectTemplate = {
                                     template: "#name#"
                                 }
                             },
-                            invalidMessage: "Client name is required",
+                            invalidMessage: "Staff name is required",
                             on: {
                                 onChange: function (newValue) {
                                     const list = this.getPopup().getList();
                                     const staffData = list.getItem(newValue);
-                                    console.log(list)
-                                    console.log(staffData)
-
-                                    console.log(staffData)
                         
                                     if (staffData) {
                                         // Auto-fill the form with client data
                                         $$("addProjectForm").setValues({
+                                            staff_id: staffData.id,
                                             staff_email: staffData.email,
                                             staff_contact_number: staffData.contact_number,
                                             staff_address: staffData.role
@@ -163,11 +177,11 @@ var addProjectTemplate = {
                             click: function () {
                                 webix.confirm("Are you sure you want to cancel and discard changes?")
                                     .then(function () {
-                                        $$("quoteForm").clear();
-                                        webix.require("js/quotes.js", function () {
+                                        $$("addProjectForm").clear();
+                                        webix.require("js/projects.js", function () {
                                             const pageContent = $$("pageContent");
                                             pageContent.removeView(pageContent.getChildViews()[0]);
-                                            pageContent.addView(quotesTemplate);
+                                            pageContent.addView(projectsTemplate);
                                         });
                                     });
                             }
@@ -180,20 +194,29 @@ var addProjectTemplate = {
                             height: 50,
                             width: 150,
                             css: "webix_primary",
-                            click: function () {
-                                const form = $$("quoteForm");
-                                if (form.validate()) {
-                                    const formData = form.getValues();
-                                    if (isEditMode) {
-                                        updateQuote();
+                                click: function () {
+                                    const form = $$("addProjectForm");
+                                    if (form.validate()) {
+                                        const formData = form.getValues();
+                                
+                                        // Extract and log only the required fields
+                                        var projectValues = {
+                                            project_name: formData.project_name,
+                                            description: formData.project_description,
+                                            project_value: formData.project_value,
+                                            status: formData.project_status,
+                                            start_date: formData.project_start_date,
+                                            expected_completion: formData.project_completion_date,
+                                            client_id: formData.client_id,
+                                            staff_id: formData.staff_id
+                                        }
+
+                                        console.log(projectValues)
                                     } else {
-                                        addQuote();
+                                        webix.message({ type: "error", text: "Please fill in all required fields correctly." });
                                     }
-                                    this.getTopParentView().hide();
-                                } else {
-                                    webix.message({ type: "error", text: "Please fill in all required fields correctly." });
                                 }
-                            }
+                                
                         }
                     ]
                 }            
