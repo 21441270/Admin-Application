@@ -114,11 +114,40 @@ var projectsTemplate = {
                         console.error("Error loading project details:", err);
                     });
                 },
-                "wxi-pencil": function(ev, id) {
+                /* "wxi-pencil": function(ev, id) {
                     isEditMode = true;
                     var item = this.getItem(id);
                     $$("projectForm").setValues(item);
                     $$("projectWindow").show();
+                }, */
+                "wxi-pencil": function (ev, id) {
+                    const item = this.getItem(id);
+                    webix.require("js/edit-project.js", function () {
+                        const pageContent = $$("pageContent");
+                        pageContent.removeView(pageContent.getChildViews()[0]);
+                        pageContent.addView(editProjectTemplate);
+
+                        webix.delay(() => {
+                            $$("editProjectForm").setValues({
+                                project_name: item.project_name,
+                                project_description: item.description,
+                                project_value: item.project_value,
+                                project_status: item.status,
+                                project_start_date: item.start_date,
+                                project_completion_date: item.expected_completion,
+                                client_name: item.client_name,
+                                client_id: item.client_id,
+                                client_email: item.client_email,
+                                client_contact_number: item.client_contact_number,
+                                client_address: item.client_address,
+                                staff_name: item.team_member,
+                                staff_id: item.staff_id,
+                                staff_email: item.staff_email,
+                                staff_contact_number: item.staff_contact_number,
+                                staff_address: item.staff_address
+                            }, true);
+                        });
+                    });
                 },
                 "wxi-trash": function (ev, id) {
                     var item = this.getItem(id);
