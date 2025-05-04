@@ -155,29 +155,25 @@ var projectsTemplate = {
                             })
 
                             const clientCombo = $$("clientSelector");
-                clientCombo.getPopup().getList().waitData.then(() => {
-                    const clientMatch = clientCombo.getPopup().getList().find(obj => obj.name === data.client_name)[0];
-                    if (clientMatch) {
-                        clientCombo.setValue(clientMatch.id);
-                        clientCombo.getInputNode().setAttribute("readonly", true);
-                        $$("editProjectForm").setValues({ client_id: clientMatch.id }, true);
-                    }
-                });
+                            clientCombo.getPopup().getList().waitData.then(() => {
+                                const clientMatch = clientCombo.getPopup().getList().find(obj => obj.name === data.client_name)[0];
+                                if (clientMatch) {
+                                    clientCombo.setValue(clientMatch.id);
+                                    clientCombo.getInputNode().setAttribute("readonly", true);
+                                    $$("editProjectForm").setValues({ client_id: clientMatch.id }, true);
+                                }
+                            });
 
-                // Set staff combo value
-                const staffCombo = $$("staffSelector");
-                staffCombo.getPopup().getList().waitData.then(() => {
-                    const staffMatch = staffCombo.getPopup().getList().find(obj => obj.name === data.project_manager)[0];
-                    if (staffMatch) {
-                        staffCombo.setValue(staffMatch.id);
-                        staffCombo.getInputNode().setAttribute("readonly", true);
-                        $$("editProjectForm").setValues({ staff_id: staffMatch.id }, true);
-                    }
-                });
-
-                            console.log($$("editProjectForm"))
-                            $//$("$client_name").setValue(newValue, {client_name: data.client_name});
-
+                            // Set staff combo value
+                            const staffCombo = $$("staffSelector");
+                            staffCombo.getPopup().getList().waitData.then(() => {
+                                const staffMatch = staffCombo.getPopup().getList().find(obj => obj.name === data.project_manager)[0];
+                                if (staffMatch) {
+                                    staffCombo.setValue(staffMatch.id);
+                                    staffCombo.getInputNode().setAttribute("readonly", true);
+                                    $$("editProjectForm").setValues({ staff_id: staffMatch.id }, true);
+                                }
+                            });
                             
                         });
                     })
