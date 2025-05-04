@@ -114,39 +114,75 @@ var projectsTemplate = {
                         console.error("Error loading project details:", err);
                     });
                 },
-                /* "wxi-pencil": function(ev, id) {
-                    isEditMode = true;
-                    var item = this.getItem(id);
-                    $$("projectForm").setValues(item);
-                    $$("projectWindow").show();
-                }, */
                 "wxi-pencil": function (ev, id) {
-                    const item = this.getItem(id);
-                    webix.require("js/edit-project.js", function () {
-                        const pageContent = $$("pageContent");
-                        pageContent.removeView(pageContent.getChildViews()[0]);
-                        pageContent.addView(editProjectTemplate);
+                    const item = this.getItem(id); // get the clicked item (row)
 
-                        webix.delay(() => {
+                    // Send project_id to PHP script
+                    webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: item.project_id })
+                    .then(function(response) {
+                        const data = response.json(); // the JSON object sent back from PHP
+
+                        console.log("data", data)
+                        webix.require("js/edit-project.js", function () {
+                            const pageContent = $$("pageContent");
+    
+                            // Remove existing view if any
+                            if (pageContent.getChildViews().length > 0) {
+                                pageContent.removeView(pageContent.getChildViews()[0]);
+                            }
+    
+                            // Add the new view
+                            pageContent.addView(editProjectTemplate);
                             $$("editProjectForm").setValues({
-                                project_name: item.project_name,
-                                project_description: item.description,
-                                project_value: item.project_value,
-                                project_status: item.status,
-                                project_start_date: item.start_date,
-                                project_completion_date: item.expected_completion,
-                                client_name: item.client_name,
-                                client_id: item.client_id,
-                                client_email: item.client_email,
-                                client_contact_number: item.client_contact_number,
-                                client_address: item.client_address,
-                                staff_name: item.team_member,
-                                staff_id: item.staff_id,
-                                staff_email: item.staff_email,
-                                staff_contact_number: item.staff_contact_number,
-                                staff_address: item.staff_address
-                            }, true);
+                                project_name: data.project_name,
+                                project_description: data.project_description,
+                                project_value: data.project_value,
+                                project_status: data.status,
+                                project_start_date: data.start_date,
+                                project_completion_date: data.expected_completion_date,
+
+                                client_id: data.client_id,
+                                //client_name: data.client_name,
+                                client_email: data.client_email,
+                                client_contact_number: data.client_phone,
+                                client_address: data.client_address,
+
+                                staff_id: data.staff_id,
+                                staff_name: data.project_manager,
+                                staff_email: data.staff_email,
+                                staff_contact_number: data.staff_contact,
+                                staff_address: data.role
+                            })
+
+                            const clientCombo = $$("clientSelector");
+                clientCombo.getPopup().getList().waitData.then(() => {
+                    const clientMatch = clientCombo.getPopup().getList().find(obj => obj.name === data.client_name)[0];
+                    if (clientMatch) {
+                        clientCombo.setValue(clientMatch.id);
+                        clientCombo.getInputNode().setAttribute("readonly", true);
+                        $$("editProjectForm").setValues({ client_id: clientMatch.id }, true);
+                    }
+                });
+
+                // Set staff combo value
+                const staffCombo = $$("staffSelector");
+                staffCombo.getPopup().getList().waitData.then(() => {
+                    const staffMatch = staffCombo.getPopup().getList().find(obj => obj.name === data.project_manager)[0];
+                    if (staffMatch) {
+                        staffCombo.setValue(staffMatch.id);
+                        staffCombo.getInputNode().setAttribute("readonly", true);
+                        $$("editProjectForm").setValues({ staff_id: staffMatch.id }, true);
+                    }
+                });
+
+                            console.log($$("editProjectForm"))
+                            $//$("$client_name").setValue(newValue, {client_name: data.client_name});
+
+                            
                         });
+                    })
+                    .catch(function(err) {
+                        console.error("Error loading project details:", err);
                     });
                 },
                 "wxi-trash": function (ev, id) {
