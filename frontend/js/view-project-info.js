@@ -1,5 +1,3 @@
-var originalProjectData = {};
-
 var viewProjectInfoTemplate = {
     rows: [
         {
@@ -16,14 +14,36 @@ var viewProjectInfoTemplate = {
                     width: 130,
                     click: function () {
                         isEditMode = false;
+                    
+                        const projectData = $$("projectOverview").getValues();
+                        const clientData = $$("clientDetails").getValues();
+                    
+                        const projectName = projectData.project_name;
+                        const projectId = projectData.project_id;
+                        const clientId = clientData.client_id;
+                        const clientName = clientData.client_name;
+                    
+                        console.log("Selected Project & Client:", { projectName, projectId, clientId, clientName });
+                    
                         webix.require("js/add-quote.js", function () {
                             const pageContent = $$("pageContent");
+                    
                             if (pageContent.getChildViews().length > 0) {
                                 pageContent.removeView(pageContent.getChildViews()[0]);
                             }
+                    
                             pageContent.addView(addQuoteTemplate);
+                    
+                            webix.delay(function () {
+                                $$("quoteForm").setValues({
+                                    project_name: projectName,
+                                    project_id: projectId,
+                                    client_id: clientId,
+                                    client_name: clientName
+                                }, true);
+                            });
                         });
-                    }
+                    }                                   
                 },
                 {
                     view: "button",

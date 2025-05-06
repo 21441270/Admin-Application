@@ -37,68 +37,10 @@ var addQuoteTemplate = {
         elements: [
             {
                 rows: [
-                    { template: "Project Details", type: "section" },
-                    {
-                        view: "combo",
-                        label: "Project ID",
-                        name: "client_id",
-                        id: "projectSelector",
-                        options: {
-                            body: {
-                                url: "http://localhost:8000/backend/projects.php",
-                                template: "#project_id#"
-                            }
-                        },
-                        invalidMessage: "Client name is required",
-                        on: {
-                            onChange: function (newValue) {
-                                const list = this.getPopup().getList();
-                                const projectData = list.getItem(newValue);
-                                console.log(list)
-                                console.log(projectData)
-
-                                console.log(projectData)
-                    
-                                if (projectData) {
-                                    // Auto-fill the form with client data
-                                    $$("quoteForm").setValues({
-                                        project_name: projectData.project_name,
-                                        project_description: projectData.description,
-                                        project_total_amount: projectData.project_value,
-                                        project_status: projectData.status,
-                                        project_completion_date: projectData.expected_completion
-                                    }, true);
-                    
-                                    // Prevent further typing
-                                    this.getInputNode().setAttribute("readonly", true);
-                                }
-                            }
-                        }
-                    },  
-                    { view: "text", label: "Client Name", name: "client_name", disabled:true },
-                    { view: "text", label: "Project Name", name: "project_name", disabled:true },
-                    { view: "text", label: "Project Description", name: "project_description", disabled:true },
-                    { view: "text", label: "Total Amount", name: "project_total_amount", disabled:true },
-                    {
-                        view: "combo",
-                        label: "Status",
-                        name: "project_status",
-                        options: ["Pending", "In Progress", "Completed"],
-                        disabled:true
-                    },
-                    {
-                        view: "datepicker",
-                        label: "Expected Completion Date",
-                        name: "project_completion_date",
-                        stringResult: true,
-                        format: "%Y-%m-%d",
-                        disabled:true
-                    }
-                ]
-            },
-            { height: 25 },
-            {
-                rows: [
+                    { template: "Project Name", type: "section" },
+                    { view: "text", label: "Project Name", name: "project_name", readonly: true, },
+                    { view: "text", label: "Client Name", name: "client_name", readonly: true, },
+                    { height: 25 },
                     { template: "Quote Information", type: "section" },
                     { view: "text", label: "Quote Description", name: "quote_description", invalidMessage: "Quote description is required" },
                 ]
