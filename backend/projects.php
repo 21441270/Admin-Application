@@ -74,5 +74,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    // Parse raw input
+    parse_str(file_get_contents("php://input"), $data);
+
+    // Check for required fields
+    if (
+        empty($data['project_id']) ||
+        empty($data['client_id']) ||
+        empty($data['staff_id']) ||
+        empty($data['project_name']) ||
+        empty($data['project_value']) ||
+        empty($data['description']) ||
+        empty($data['start_date']) ||
+        empty($data['expected_completion']) ||
+        empty($data['status'])
+    ) {
+        echo json_encode(["status" => "error", "message" => "Missing required fields"]);
+        exit;
+    }
+
+    // Sanitize inputs
+    $project_id = $conn->real_escape_string($data["project_id"]);
+    $client_id = $conn->real_escape_string($data["client_id"]);
+    $staff_id = $conn->real_escape_string($data["staff_id"]);
+    $project_name = $conn->real_escape_string($data["project_name"]);
+    $project_value = $conn->real_escape_string($data["project_value"]);
+    $description = $conn->real_escape_string($data["description"]);
+    $start_date = $conn->real_escape_string($data["start_date"]);
+    $expected_completion = $conn->real_escape_string($data["expected_completion"]);
+    $status = $conn->real_escape_string($data["status"]);
+
+    // Run update query
+    $sql = "UPDATE projects SET 
+                client_id = '$client_id',
+                staff_id = '$staff_id',
+                project_name = '$project_name',
+                project_value = '$project_value',
+                description = '$description',
+                start_date = '$start_date',
+                expected_completion = '$expected_completion',
+                status = '$status'
+            WHERE id = '$project_id'";
+
+    if ($conn->query($sql)) {
+        echo json_encode(["status" => "success", "message" => "Project updated successfully"]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+    }
+
+    exit;
+}
+
+
 
 ?>
