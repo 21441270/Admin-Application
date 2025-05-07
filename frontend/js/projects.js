@@ -116,13 +116,13 @@ var projectsTemplate = {
                 },
                 "wxi-pencil": function (ev, id) {
                     const item = this.getItem(id); // get the clicked item (row)
+                    console.log(item)
 
                     // Send project_id to PHP script
                     webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: item.project_id })
                     .then(function(response) {
                         const data = response.json(); // the JSON object sent back from PHP
 
-                        console.log("data", data)
                         webix.require("js/edit-project.js", function () {
                             const pageContent = $$("pageContent");
     
@@ -130,10 +130,11 @@ var projectsTemplate = {
                             if (pageContent.getChildViews().length > 0) {
                                 pageContent.removeView(pageContent.getChildViews()[0]);
                             }
-    
+
                             // Add the new view
                             pageContent.addView(editProjectTemplate);
                             $$("editProjectForm").setValues({
+                                project_id: item.project_id,
                                 project_name: data.project_name,
                                 project_description: data.project_description,
                                 project_value: data.project_value,

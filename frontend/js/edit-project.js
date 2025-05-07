@@ -49,6 +49,7 @@ var editProjectTemplate = {
                 {
                     rows: [
                         { template: "Project Details", type: "section" },
+                        { view: "text", name: "project_id", hidden: true },
                         { view: "text", label: "Project Name", name: "project_name", invalidMessage: "Project name is required" },
                         { view: "text", label: "Project Description", name: "project_description", invalidMessage: "Description is required" },
                         { view: "text", label: "Project Value", name: "project_value", invalidMessage: "Value is required" },
@@ -195,8 +196,9 @@ var editProjectTemplate = {
                                 const form = $$("editProjectForm");
                                 if (form.validate()) {
                                     const formData = form.getValues();
-
+                            
                                     var projectValues = {
+                                        project_id: formData.project_id,
                                         project_name: formData.project_name,
                                         description: formData.project_description,
                                         project_value: formData.project_value,
@@ -206,12 +208,33 @@ var editProjectTemplate = {
                                         client_id: formData.client_id,
                                         staff_id: formData.staff_id
                                     }
-
-                                    console.log(projectValues)
+                            
+                                    webix.ajax().put("http://localhost:8000/backend/projects.php", projectValues, {
+                                        success: function (response) {
+                                            const result = JSON.parse(response);
+                            
+                                            if (result.status === "success") {
+                                                webix.message({ type: "success", text: result.message });
+                            
+                                                // Optionally return to projects list
+                                                webix.require("js/projects.js", function () {
+                                                    const pageContent = $$("pageContent");
+                                                    pageContent.removeView(pageContent.getChildViews()[0]);
+                                                    pageContent.addView(projectsTemplate);
+                                                });
+                                            } else {
+                                                webix.message({ type: "error", text: result.message || "Failed to save project." });
+                                            }
+                                        },
+                                        error: function () {
+                                            webix.message({ type: "error", text: "Server error. Please try again later." });
+                                        }
+                                    });
                                 } else {
                                     webix.message({ type: "error", text: "Please fill in all required fields correctly." });
                                 }
                             }
+                                
                         }
                     ]
                 }
