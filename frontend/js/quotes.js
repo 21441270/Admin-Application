@@ -18,10 +18,6 @@ var quotesTemplate = {
                     css: "webix_primary",
                     click: function () {
                         isEditMode = false;
-                        // $$("quoteForm").clear();
-                        // $$("quoteWindow").show();
-
-
                         webix.require("js/add-quote.js", function () {
                             const pageContent = $$("pageContent");
                             if (pageContent.getChildViews().length > 0) {
@@ -31,6 +27,20 @@ var quotesTemplate = {
                             pageContent.addView(addQuoteTemplate);
                         });
 
+                    }
+                },
+                {
+                    view: "button",
+                    id: "backBtn",
+                    label: "Back",
+                    css: "webix_primary",
+                    width: 100,
+                    click: function () {
+                        webix.require("js/projects.js", function () {
+                            const pageContent = $$("pageContent");
+                            pageContent.removeView(pageContent.getChildViews()[0]);
+                            pageContent.addView(projectsTemplate);
+                        });
                     }
                 }
             ]

@@ -149,6 +149,7 @@ var viewProjectInfoTemplate = {
                                 }
                             ]
                         },
+                        
                         {
                             cols: [
                                 {
@@ -174,6 +175,83 @@ var viewProjectInfoTemplate = {
                 {
                     rows: [
                         { template: "Quote Summary", type: "section" },
+                        {
+                            cols: [
+                                {}, // spacer to push the button to the right
+                                {
+                                    view: "button",
+                                    id: "quoteMgmtBtn",
+                                    label: "Quote Management",
+                                    width: 180,
+                                    css: "webix_primary",
+                                    click: function () {
+                                        webix.require("js/quotes.js", function () {
+                                            const pageContent = $$("pageContent");
+                                    
+                                            if (pageContent.getChildViews().length > 0) {
+                                                pageContent.removeView(pageContent.getChildViews()[0]);
+                                            }
+                                        
+                                                pageContent.addView(quotesTemplate);
+                                        });
+
+
+                                    /* const projectData = $$("projectOverview").getValues();
+                                        const clientData = $$("clientDetails").getValues();
+                                    
+                                        const projectName = projectData.project_name;
+                                        const projectId = projectData.project_id;
+                                        const clientId = clientData.client_id;
+                                        const clientName = clientData.client_name;
+                                    
+                                        console.log("Selected Project & Client:", { projectName, projectId, clientId, clientName }); */
+                                    
+                                        /* webix.require("js/add-quote.js", function () {
+                                            const pageContent = $$("pageContent");
+                                    
+                                            if (pageContent.getChildViews().length > 0) {
+                                                pageContent.removeView(pageContent.getChildViews()[0]);
+                                            }
+                                    
+                                            pageContent.addView(addQuoteTemplate);
+                                    
+                                            webix.delay(function () {
+                                                $$("quoteForm").setValues({
+                                                    project_name: projectName,
+                                                    project_id: projectId,
+                                                    client_id: clientId,
+                                                    client_name: clientName
+                                                }, true);
+                                            }); */
+                                            /* 
+                                        // Send project_id to PHP script
+                                        webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: projectId })
+                                        .then(function(response) {
+                                            const data = response.json(); // the JSON object sent back from PHP
+
+                                            webix.require("js/quotes.js", function () {
+                                                const pageContent = $$("pageContent");
+                                                
+                                                if (pageContent.getChildViews().length > 0) {
+                                                    pageContent.removeView(pageContent.getChildViews()[0]);
+                                                }
+                                                
+                                                pageContent.addView(quotesTemplate);
+
+                                                console.log(data)
+                                                    $$("quotesTable").clearAll();
+                                                    $$("quotesTable").parse(data.quotes);
+                                            });
+                                        })
+                                        .catch(function(err) {
+                                            console.error("Error loading project details:", err);
+                                        }); */
+
+                                    }
+                                      
+                                }
+                            ]
+                        },
                         {
                             view: "datatable",
                             id: "quote_table",
