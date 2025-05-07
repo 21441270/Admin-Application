@@ -189,8 +189,8 @@ var addProjectTemplate = {
                         { width: 20 }, // space between Cancel and Save buttons
                         {
                             view: "button",
-                            id: "saveQuoteBtn",
-                            value: "Save Quote",
+                            id: "saveProjectBtn",
+                            value: "Save Project",
                             height: 50,
                             width: 150,
                             css: "webix_primary",
@@ -212,6 +212,22 @@ var addProjectTemplate = {
                                         }
 
                                         console.log(projectValues)
+
+                                        webix.ajax().post("http://localhost:8000/backend/projects.php", projectValues)
+                                        .then(function (response) {
+                                            webix.message("Project saved successfully!");
+                                            $$("addProjectForm").clear();
+                                            webix.require("js/projects.js", function () {
+                                                const pageContent = $$("pageContent");
+                                                pageContent.removeView(pageContent.getChildViews()[0]);
+                                                pageContent.addView(projectsTemplate);
+                                            });
+                                        })
+                                        .catch(function (err) {
+                                            webix.message({ type: "error", text: "Failed to save project." });
+                                            console.error(err);
+                                        });
+
                                     } else {
                                         webix.message({ type: "error", text: "Please fill in all required fields correctly." });
                                     }

@@ -239,7 +239,7 @@ var projectsTemplate = {
 
 
 
-webix.ui({
+/* webix.ui({
     view: "window",
     id: "projectWindow",
     head: "Project Information",
@@ -340,7 +340,7 @@ function updateProject() {
         });
     }
 }
-
+ */
 /* webix.ui({
     view: "window",
     id: "projectViewWindow",
