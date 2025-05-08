@@ -40,6 +40,8 @@ var addQuoteTemplate = {
                     { template: "Project Name", type: "section" },
                     { view: "text", label: "Project Name", name: "project_name", readonly: true, },
                     { view: "text", label: "Client Name", name: "client_name", readonly: true, },
+                    { view: "text", name: "project_id", hidden: true },
+                    { view: "text", name: "client_id", hidden: true },
                     { height: 25 },
                     { template: "Quote Information", type: "section" },
                     { view: "text", label: "Quote Description", name: "quote_description", invalidMessage: "Quote description is required" },

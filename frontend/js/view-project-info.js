@@ -1,3 +1,5 @@
+var selectedQuoteContext = {};
+
 var viewProjectInfoTemplate = {
     rows: [
         {
@@ -192,7 +194,18 @@ var viewProjectInfoTemplate = {
                                     click: function () {
 
                                         const projectData = $$("projectOverview").getValues();
-                                        const projectId = projectData.project_id;
+                                        const clientData = $$("clientDetails").getValues();
+
+                                        selectedQuoteContext = {
+                                            project_id: projectData.project_id,
+                                            project_name: projectData.project_name,
+                                            client_id: clientData.client_id,
+                                            client_name: clientData.client_name
+                                        };
+
+                                        console.log(selectedQuoteContext)
+
+                                        const projectId = selectedQuoteContext.project_id;
                                     
                                         webix.require("js/quotes.js", function () {
                                             const pageContent = $$("pageContent");
@@ -206,68 +219,6 @@ var viewProjectInfoTemplate = {
                                             $$("quotesTable").clearAll();
                                             $$("quotesTable").load("http://localhost:8000/backend/quotes.php?project_id=" + projectId);
                                         });
-                                        
-                                        /* webix.require("js/quotes.js", function () {
-                                            const pageContent = $$("pageContent");
-                                    
-                                            if (pageContent.getChildViews().length > 0) {
-                                                pageContent.removeView(pageContent.getChildViews()[0]);
-                                            }
-                                        
-                                                pageContent.addView(quotesTemplate);
-                                        });
-
-
-                                       const projectData = $$("projectOverview").getValues();
-                                        const clientData = $$("clientDetails").getValues();
-                                    
-                                        const projectName = projectData.project_name;
-                                        const projectId = projectData.project_id;
-                                        const clientId = clientData.client_id;
-                                        const clientName = clientData.client_name;
-                                    
-                                        console.log("Selected Project & Client:", { projectName, projectId, clientId, clientName });
-                                     */
-                                        /* webix.require("js/add-quote.js", function () {
-                                            const pageContent = $$("pageContent");
-                                    
-                                            if (pageContent.getChildViews().length > 0) {
-                                                pageContent.removeView(pageContent.getChildViews()[0]);
-                                            }
-                                    
-                                            pageContent.addView(addQuoteTemplate);
-                                    
-                                            webix.delay(function () {
-                                                $$("quoteForm").setValues({
-                                                    project_name: projectName,
-                                                    project_id: projectId,
-                                                    client_id: clientId,
-                                                    client_name: clientName
-                                                }, true);
-                                            }); */
-                                        // Send project_id to PHP script
-                                        /* webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: projectId })
-                                        .then(function(response) {
-                                            const data = response.json(); // the JSON object sent back from PHP
-
-                                            webix.require("js/quotes.js", function () {
-                                                const pageContent = $$("pageContent");
-                                                
-                                                if (pageContent.getChildViews().length > 0) {
-                                                    pageContent.removeView(pageContent.getChildViews()[0]);
-                                                }
-                                                
-                                                pageContent.addView(quotesTemplate);
-
-                                                console.log(data)
-                                                    $$("quotesTable").clearAll();
-                                                    $$("quotesTable").parse(data.quotes);
-                                            });
-                                        })
-                                        .catch(function(err) {
-                                            console.error("Error loading project details:", err);
-                                        }); */
-
                                     }
                                       
                                 }

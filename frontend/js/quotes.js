@@ -18,6 +18,13 @@ var quotesTemplate = {
                     css: "webix_primary",
                     click: function () {
                         isEditMode = false;
+                        const projectName = selectedQuoteContext.project_name
+                        const projectId = selectedQuoteContext.project_id
+                        const clientId = selectedQuoteContext.client_id
+                        const clientName = selectedQuoteContext.client_name
+                        console.log("Selected Project & Client:", { projectName, projectId, clientId, clientName });
+                    
+
                         webix.require("js/add-quote.js", function () {
                             const pageContent = $$("pageContent");
                             if (pageContent.getChildViews().length > 0) {
@@ -25,7 +32,16 @@ var quotesTemplate = {
                             }
     
                             pageContent.addView(addQuoteTemplate);
-                        });
+
+                            webix.delay(function () {
+                                $$("quoteForm").setValues({
+                                    project_name: projectName,
+                                    project_id: projectId,
+                                    client_id: clientId,
+                                    client_name: clientName
+                                }, true);
+                            });
+                        });                       
 
                     }
                 },
