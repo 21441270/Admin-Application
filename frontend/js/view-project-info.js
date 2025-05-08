@@ -12,9 +12,7 @@ var viewProjectInfoTemplate = {
                     label: "Add Quote",
                     type: "form",
                     width: 130,
-                    click: function () {
-                        isEditMode = false;
-                    
+                    click: function () {                    
                         const projectData = $$("projectOverview").getValues();
                         const clientData = $$("clientDetails").getValues();
                     
@@ -80,7 +78,8 @@ var viewProjectInfoTemplate = {
                                         { label: "Project Name", type: "text", id: "project_name" },
                                         { label: "Status", type: "text", id: "status" },
                                         { label: "Start Date", type: "text", id: "start_date" },
-                                        { label: "Expected Completion", type: "text", id: "expected_completion" }
+                                        { label: "Expected Completion", type: "text", id: "expected_completion" },
+                                        { view: "text", name: "project_id", hidden: true }
                                     ]
                                 }
                             ]
@@ -98,7 +97,8 @@ var viewProjectInfoTemplate = {
                                         { label: "Name", type: "text", id: "client_name" },
                                         { label: "Email", type: "text", id: "client_email" },
                                         { label: "Phone", type: "text", id: "client_phone" },
-                                        { label: "Address", type: "text", id: "client_address" }
+                                        { label: "Address", type: "text", id: "client_address" },
+                                        { view: "text", name: "client_id", hidden: true }
                                     ]
                                 }
                             ]
@@ -152,6 +152,11 @@ var viewProjectInfoTemplate = {
                         
                         {
                             cols: [
+                                { 
+                                    view: "text",
+                                    name: "staff_id",
+                                    hidden: true
+                                },
                                 {
                                     view: "text",
                                     id: "staff_contact",
@@ -185,7 +190,24 @@ var viewProjectInfoTemplate = {
                                     width: 180,
                                     css: "webix_primary",
                                     click: function () {
+
+                                        const projectData = $$("projectOverview").getValues();
+                                        const projectId = projectData.project_id;
+                                    
                                         webix.require("js/quotes.js", function () {
+                                            const pageContent = $$("pageContent");
+                                            if (pageContent.getChildViews().length > 0) {
+                                                pageContent.removeView(pageContent.getChildViews()[0]);
+                                            }
+                                    
+                                            pageContent.addView(quotesTemplate);
+                                    
+                                            // Now filter quotes by project_id
+                                            $$("quotesTable").clearAll();
+                                            $$("quotesTable").load("http://localhost:8000/backend/quotes.php?project_id=" + projectId);
+                                        });
+                                        
+                                        /* webix.require("js/quotes.js", function () {
                                             const pageContent = $$("pageContent");
                                     
                                             if (pageContent.getChildViews().length > 0) {
@@ -196,7 +218,7 @@ var viewProjectInfoTemplate = {
                                         });
 
 
-                                    /* const projectData = $$("projectOverview").getValues();
+                                       const projectData = $$("projectOverview").getValues();
                                         const clientData = $$("clientDetails").getValues();
                                     
                                         const projectName = projectData.project_name;
@@ -204,8 +226,8 @@ var viewProjectInfoTemplate = {
                                         const clientId = clientData.client_id;
                                         const clientName = clientData.client_name;
                                     
-                                        console.log("Selected Project & Client:", { projectName, projectId, clientId, clientName }); */
-                                    
+                                        console.log("Selected Project & Client:", { projectName, projectId, clientId, clientName });
+                                     */
                                         /* webix.require("js/add-quote.js", function () {
                                             const pageContent = $$("pageContent");
                                     
@@ -223,9 +245,8 @@ var viewProjectInfoTemplate = {
                                                     client_name: clientName
                                                 }, true);
                                             }); */
-                                            /* 
                                         // Send project_id to PHP script
-                                        webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: projectId })
+                                        /* webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: projectId })
                                         .then(function(response) {
                                             const data = response.json(); // the JSON object sent back from PHP
 

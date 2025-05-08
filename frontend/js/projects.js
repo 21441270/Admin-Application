@@ -74,6 +74,7 @@ var projectsTemplate = {
                     webix.ajax().post("http://localhost:8000/backend/project_info_details.php", { project_id: item.project_id })
                     .then(function(response) {
                         const data = response.json(); // the JSON object sent back from PHP
+                        console.log(data)
 
                         webix.require("js/view-project-info.js", function () {
                             const pageContent = $$("pageContent");
@@ -89,14 +90,16 @@ var projectsTemplate = {
                                     "project_name": data.project_name,
                                     "status": data.status,
                                     "start_date": data.start_date,
-                                    "expected_completion": data.expected_completion_date
+                                    "expected_completion": data.expected_completion_date,
+                                    "project_id": item.project_id
                                 });
                 
                                 $$("clientDetails").setValues({
                                     "client_name": data.client_name,
                                     "client_email": data.client_email,
                                     "client_phone": data.client_phone,
-                                    "client_address": data.client_address
+                                    "client_address": data.client_address,
+                                    "client_id": data.client_id
                                 });
 
                                 $$("description").setValue(data.project_description);
@@ -108,6 +111,11 @@ var projectsTemplate = {
 
                                 $$("quote_table").clearAll();
                                 $$("quote_table").parse(data.quotes); 
+                                $$("staff_id").setValue(data.staff_id);
+
+                                console.log(data.quotes)
+
+
                         });
                     })
                     .catch(function(err) {
