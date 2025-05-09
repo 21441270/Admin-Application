@@ -200,6 +200,19 @@ var projectsTemplate = {
                         type: "confirm-warning",
                         callback: function (result) {
                             console.log("Delete Project")
+                            if (result) {
+                                webix.ajax().del("http://localhost:8000/backend/projects.php", {
+                                    project_id: item.project_id
+                                })
+                                .then(function () {
+                                    webix.message("Project deleted successfully!");
+                                    $$("projectsTable").remove(id);
+                                })
+                                .catch(function (err) {
+                                    webix.message({ type: "error", text: "Failed to delete project" });
+                                    console.error("Delete error:", err);
+                                });
+                            }
                         }
                     });
                 }

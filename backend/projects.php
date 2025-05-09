@@ -126,6 +126,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    // Parse raw input
+    parse_str(file_get_contents("php://input"), $data);
+
+    if (empty($data['project_id'])) {
+        echo json_encode(["status" => "error", "message" => "Missing project ID"]);
+        exit;
+    }
+
+    $project_id = $conn->real_escape_string($data['project_id']);
+
+    // Delete the project
+    $sql = "DELETE FROM projects WHERE id = '$project_id'";
+
+    if ($conn->query($sql)) {
+        echo json_encode(["status" => "success", "message" => "Project deleted successfully"]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+    }
+
+    exit;
+}
+
+
 
 
 ?>
