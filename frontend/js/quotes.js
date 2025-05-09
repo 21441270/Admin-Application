@@ -1,6 +1,3 @@
-// Variable to track edit mode
-var isEditMode = false;
-
 var quotesTemplate = {
     rows: [
         {
@@ -17,7 +14,6 @@ var quotesTemplate = {
                     width: 130,
                     css: "webix_primary",
                     click: function () {
-                        isEditMode = false;
                         const projectName = selectedQuoteContext.project_name
                         const projectId = selectedQuoteContext.project_id
                         const clientId = selectedQuoteContext.client_id
@@ -150,26 +146,63 @@ var quotesTemplate = {
                         console.error("Error loading project details:", err);
                     });
                 },
-                "wxi-pencil": function(ev, id) { // Edit Button
-                    isEditMode = true;
+                "wxi-pencil": function (ev, id) {
+                    const item = this.getItem(id); // get the clicked item (row)
+                    const projectName = selectedQuoteContext.project_name
+                    const projectId = selectedQuoteContext.project_id
+                    const clientId = selectedQuoteContext.client_id
+                    const clientName = selectedQuoteContext.client_name
+                    console.log("Selected Project & Client:", { projectName, projectId, clientId, clientName });
 
-                    var item = this.getItem(id);
-                    console.log("Edit")
-                    console.log(this)
                     console.log(item)
-                    $$("quoteForm").setValues({
-                        id: item.id,
-                        first_name: item.first_name,
-                        middle_name: item.middle_name,
-                        last_name: item.last_name,
-                        contact_number: item.contact_number,
-                        email: item.email,
-                        address_line: item.address_line,
-                        city: item.city,
-                        postcode: item.postcode
+
+                    // Send project_id to PHP script
+                    webix.ajax().post("http://localhost:8000/backend/quote_info_details.php", { quote_id: item.id })
+                    .then(function(response) {
+                        const data = response.json(); // the JSON object sent back from PHP
+                        console.log(data)
+
+                        webix.require("js/edit-quote.js", function () {
+                            const pageContent = $$("pageContent");
+    
+                            // Remove existing view if any
+                            if (pageContent.getChildViews().length > 0) {
+                                pageContent.removeView(pageContent.getChildViews()[0]);
+                            }
+
+                            // Add the new view
+                            pageContent.addView(editQuoteTemplate);
+                            
+                            $$("quoteForm").setValues({
+                                project_name: projectName,
+                                project_id: projectId,
+                                client_id: clientId,
+                                client_name: clientName,
+                                quote_description: data.quote_description,
+                                quote_amount: data.total_amount
+                            })
+
+                            // Show loading overlay while the data is being processed
+                            $$("requirement_table").showOverlay("Loading...");
+
+                            
+                            $$("requirement_table").parse(data.requirements); 
+
+                            // Hide loading overlay once data is loaded
+                            $$("requirement_table").hideOverlay();
+
+                            // Check if requirements are empty and show overlay if so
+                            if (data.requirements.length === 0) {
+                                $$("requirement_table").showOverlay("No Requirements Found");
+                            } else {
+                                $$("requirement_table").hideOverlay();
+                            }
+                            
+                        });
                     })
-                    $$("quoteWindow").show();
-                    
+                    .catch(function(err) {
+                        console.error("Error loading project details:", err);
+                    });
                 },
                 "wxi-trash": function (ev, id) {
                     var item = this.getItem(id);
