@@ -205,7 +205,7 @@ var addQuoteTemplate = {
 
                                 webix.ajax().headers({
                                     "Content-Type": "application/json"
-                                }).post("http://localhost:8000/backend/add_quote.php", JSON.stringify(quoteData), {
+                                }).post("http://localhost:8000/backend/quotes.php", JSON.stringify(quoteData), {
                                     error: function (text, data, xhr) {
                                         webix.message({ type: "error", text: "Failed to save quote." });
                                     },
