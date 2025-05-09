@@ -31,6 +31,7 @@ var quotesTemplate = {
                                 pageContent.removeView(pageContent.getChildViews()[0]);
                             }
     
+                            requirementIdCounter = 1;
                             pageContent.addView(addQuoteTemplate);
 
                             webix.delay(function () {
