@@ -174,6 +174,7 @@ var quotesTemplate = {
                             pageContent.addView(editQuoteTemplate);
                             
                             $$("quoteForm").setValues({
+                                quote_id: data.quote_id,
                                 project_name: projectName,
                                 project_id: projectId,
                                 client_id: clientId,

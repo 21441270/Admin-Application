@@ -41,6 +41,7 @@ var editQuoteTemplate = {
                         { template: "Project Name", type: "section" },
                         { view: "text", label: "Project Name", name: "project_name", disabled: true },
                         { view: "text", label: "Client Name", name: "client_name", disabled: true },
+                        { view: "text", name: "quote_id", hidden: true },
                         { view: "text", name: "project_id", hidden: true },
                         { view: "text", name: "client_id", hidden: true },
                         { height: 25 },
@@ -154,6 +155,7 @@ var editQuoteTemplate = {
                             const requirementTableData = $$("requirement_table").serialize();
 
                             const quoteData = {
+                                quote_id: formData.quote_id,
                                 client_id: formData.client_id,
                                 project_id: formData.project_id,
                                 quote_amount: formData.quote_amount,
@@ -163,19 +165,19 @@ var editQuoteTemplate = {
 
                             webix.ajax().headers({
                                 "Content-Type": "application/json"
-                            }).post("http://localhost:8000/backend/quotes.php", JSON.stringify(quoteData), {
+                            }).put("http://localhost:8000/backend/quotes.php", JSON.stringify(quoteData), {
                                 error: function () {
-                                    webix.message({ type: "error", text: "Failed to save quote." });
+                                    webix.message({ type: "error", text: "Failed to update quote." });
                                 },
                                 success: function () {
-                                    webix.message({ type: "success", text: "Quote saved successfully!" });
+                                    webix.message({ type: "success", text: "Quote updated successfully!" });
                                     webix.require("js/quotes.js", function () {
                                         const pageContent = $$("pageContent");
                                         pageContent.removeView(pageContent.getChildViews()[0]);
                                         pageContent.addView(quotesTemplate);
                                     });
                                 }
-                            });
+                            });                            
                         } else {
                             webix.message({ type: "error", text: "Please fill in all required fields correctly." });
                         }
