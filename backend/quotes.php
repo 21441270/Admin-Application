@@ -115,6 +115,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    // Read the raw DELETE input
+    parse_str(file_get_contents("php://input"), $data);
+
+    // Check if the ID is provided
+    if (empty($data['id'])) {
+        echo json_encode(["status" => "error", "message" => "Missing quote ID"]);
+        exit;
+    }
+
+    // Get the quote ID and delete the record from the quotes table
+    $id = intval($data['id']);
+    $sql = "DELETE FROM quotes WHERE id = $id";
+
+    if ($conn->query($sql)) {
+        echo json_encode(["status" => "success", "message" => "Quote deleted successfully"]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+    }
+
+    exit;
+}
+
+
 // Handle GET (fetch quotes)
 $projectId = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
 
