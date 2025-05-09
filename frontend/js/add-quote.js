@@ -83,8 +83,14 @@ var addQuoteTemplate = {
                                 } else {
                                     this.hideOverlay();
                                 }
+                            },
+                            onAfterRender: function () {
+                                if (!this.count()) {
+                                    this.showOverlay("No quote requirements have been added yet.");
+                                }
                             }
                         }
+                        
                     }
                     
                 ]
