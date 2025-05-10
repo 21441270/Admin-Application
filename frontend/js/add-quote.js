@@ -59,27 +59,30 @@ var addQuoteTemplate = {
                             width: 150,
                             css: "webix_primary",
                             click: function () {
-                                const requirementText = $$("quoteForm").getValues().requirement;
-                        
+                                const form = $$("quoteForm");
+                                const requirementText = form.getValues().requirement;
+
                                 if (!requirementText || requirementText.trim() === "") {
                                     webix.message({ type: "error", text: "Requirement cannot be empty." });
                                     return;
                                 }
-                        
+
                                 const table = $$("requirement_table");
-                                const now = new Date().toLocaleString(); // readable timestamp
-                        
+                                const now = new Date().toLocaleString();
+
                                 table.add({
-                                    requirement_id: requirementIdCounter++, // use and increment
+                                    requirement_id: requirementIdCounter++,
                                     requirement_text: requirementText,
                                     requirement_created_at: now
                                 });
-                        
-                                // Clear the input field after adding
-                                $$("quoteForm").setValues({ requirement: "" }, true);
+
+                                form.setValues({ requirement: "" }, true);
+
+                                if (table.count() > 0) {
+                                    table.hideOverlay();
+                                }
                             }
                         }
-                            
                     ]
                 },
                 {
@@ -89,12 +92,22 @@ var addQuoteTemplate = {
                             id: "requirement_table",
                             height: 500,
                             scrollX: false,
+                            editable: true,
                             footer: true,
                             columns: [
                                 { id: "requirement_id", header: "Requirement ID", width: 100 },
-                                { id: "requirement_text", header: "Description", fillspace: true },
-                                { id: "requirement_created_at", header: "Created Date", width: 180 }
+                                { id: "requirement_text", editor: "text", header: "Description", fillspace: true },
+                                { id: "requirement_created_at", header: "Created Date", width: 180 },
+                                {
+                                    id: "delete", header: "", width: 50, template: "<span class='webix_icon wxi-trash'></span>"
+                                }
                             ],
+                            onClick: {
+                                "wxi-trash": function (e, id) {
+                                    this.remove(id);
+                                    return false;
+                                }
+                            },
                             on: {
                                 onAfterLoad: function () {
                                     if (!this.count()) {
@@ -104,6 +117,11 @@ var addQuoteTemplate = {
                                     }
                                 },
                                 onAfterRender: function () {
+                                    if (!this.count()) {
+                                        this.showOverlay("No quote requirements have been added yet.");
+                                    }
+                                },
+                                onAfterDelete: function () {
                                     if (!this.count()) {
                                         this.showOverlay("No quote requirements have been added yet.");
                                     }
@@ -148,42 +166,12 @@ var addQuoteTemplate = {
                     height: 50,
                     width: 150,
                     css: "webix_primary",
-                    // click: function () {
-                    //     const form = $$("quoteForm");
-                    //     if (form.validate()) {
-                    //         const formData = form.getValues();
-                    //         const requirementTableData = $$("requirement_table").serialize();
-                
-                    //         // Log the required fields
-                    //         console.log("Project ID:", formData.project_id);
-                    //         console.log("Client ID:", formData.client_id);
-                    //         console.log("Quote Description:", formData.quote_description);
-                    //         console.log("Quote Amount:", formData.quote_amount);
-                    //         console.log("Requirements:", requirementTableData);
-                
-                    //         /* if (requirementTableData.length === 0) {
-                    //             console.log("No requirements added.");
-                    //         } else {
-                    //             console.log("Requirements:");
-                    //             requirementTableData.forEach((item, index) => {
-                    //                 console.log(
-                    //                     ` Description: ${item.requirement_text}, Created At: ${item.requirement_created_at}`
-                    //                 );
-                    //             });
-                    //         } */
-                
-                    //     } else {
-                    //         webix.message({ type: "error", text: "Please fill in all required fields correctly." });
-                    //     }
-                    // }
-
                     click: function () {
                         const form = $$("quoteForm");
                         if (form.validate()) {
                             const formData = form.getValues();
                             const requirementTableData = $$("requirement_table").serialize();
-                            
-                            // Prepare data to send
+
                             const quoteData = {
                                 client_id: formData.client_id,
                                 project_id: formData.project_id,
@@ -192,42 +180,26 @@ var addQuoteTemplate = {
                                 requirements: requirementTableData
                             };
 
-                            /* console.log(quoteData)
+                            webix.ajax().headers({
+                                "Content-Type": "application/json"
+                            }).post("http://localhost:8000/backend/quotes.php", JSON.stringify(quoteData), {
+                                error: function () {
+                                    webix.message({ type: "error", text: "Failed to save quote." });
+                                },
+                                success: function () {
+                                    webix.message({ type: "success", text: "Quote saved successfully!" });
 
-                            if (requirementTableData.length === 0) {
-                                console.log("No requirements added.");
-                            } else {
-                                console.log("Requirements:");
-                                    requirementTableData.forEach((item, index) => {
-                                    console.log(`${item.requirement_text}`);
-                                });
-                            } */
-
-                                webix.ajax().headers({
-                                    "Content-Type": "application/json"
-                                }).post("http://localhost:8000/backend/quotes.php", JSON.stringify(quoteData), {
-                                    error: function (text, data, xhr) {
-                                        webix.message({ type: "error", text: "Failed to save quote." });
-                                    },
-                                    success: function (text, data, xhr) {
-                                        webix.message({ type: "success", text: "Quote saved successfully!" });
-                                
-                                        webix.require("js/quotes.js", function () {
-                                            const pageContent = $$("pageContent");
-                                            pageContent.removeView(pageContent.getChildViews()[0]);
-                                            pageContent.addView(quotesTemplate);
-                                        });
-                                    }
-                                });
-                                
-                                
-
-                            
+                                    webix.require("js/quotes.js", function () {
+                                        const pageContent = $$("pageContent");
+                                        pageContent.removeView(pageContent.getChildViews()[0]);
+                                        pageContent.addView(quotesTemplate);
+                                    });
+                                }
+                            });
                         } else {
                             webix.message({ type: "error", text: "Please fill in all required fields correctly." });
                         }
                     }
-                    
                 }
             ]
         }
