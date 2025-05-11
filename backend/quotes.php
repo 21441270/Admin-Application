@@ -116,27 +116,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    // Read the raw DELETE input
+    // Read the raw DELETE data
     parse_str(file_get_contents("php://input"), $data);
 
-    // Check if the ID is provided
-    if (empty($data['id'])) {
-        echo json_encode(["status" => "error", "message" => "Missing quote ID"]);
+    // Handle requirement deletion
+    if (!empty($data['requirement_id'])) {
+        $requirementId = intval($data['requirement_id']);
+        $sql = "DELETE FROM requirements WHERE id = $requirementId";
+
+        if ($conn->query($sql)) {
+            echo json_encode(["status" => "success", "message" => "Requirement deleted successfully"]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+        }
         exit;
     }
 
-    // Get the quote ID and delete the record from the quotes table
-    $id = intval($data['id']);
-    $sql = "DELETE FROM quotes WHERE id = $id";
+    // Handle quote deletion
+    if (!empty($data['id'])) {
+        $quoteId = intval($data['id']);
+        $sql = "DELETE FROM quotes WHERE id = $quoteId";
 
-    if ($conn->query($sql)) {
-        echo json_encode(["status" => "success", "message" => "Quote deleted successfully"]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+        if ($conn->query($sql)) {
+            echo json_encode(["status" => "success", "message" => "Quote deleted successfully"]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+        }
+        exit;
     }
 
+    // If neither ID is set
+    echo json_encode(["status" => "error", "message" => "Missing ID for deletion"]);
     exit;
 }
+
 
 
 // Handle GET (fetch quotes)

@@ -73,7 +73,8 @@ var editQuoteTemplate = {
                                 table.add({
                                     requirement_id: requirementIdCounter++,
                                     requirement_text: requirementText,
-                                    requirement_created_at: now
+                                    requirement_created_at: now,
+                                    is_new: true
                                 });
 
                                 $$("quoteForm").setValues({ requirement: "" }, true);
@@ -93,8 +94,45 @@ var editQuoteTemplate = {
                             columns: [
                                 { id: "requirement_id", header: "Requirement ID", width: 100 },
                                 { id: "requirement_text", editor: "text", header: "Description", fillspace: true },
-                                { id: "requirement_created_at", header: "Created Date", width: 180 }
+                                { id: "requirement_created_at", header: "Created Date", width: 180 },
+                                {
+                                    id: "actions",
+                                    header: "Actions",
+                                    template: "<span class='webix_icon wxi-trash'></span>",
+                                    width: 80
+                                }
                             ],
+                            onClick: {
+                                "wxi-trash": function (e, id) {
+                                    const item = this.getItem(id);
+                                    console.log(item)
+                            
+                                    if (item.is_new || !item.requirement_id) {
+                                        // New requirement: delete locally
+                                        this.remove(id);
+                                        console.log("New Requirement")
+                                    } else {
+                                        console.log("Existing Requirement")
+                                        // Existing requirement: delete via AJAX
+                                        webix.confirm("This is an existing requirement. Do you want to delete it permanently?")
+                                            .then(() => {
+                                                webix.ajax().del("http://localhost:8000/backend/quotes.php", {
+                                                    requirement_id: item.requirement_id
+                                                })
+                                                .then(() => {
+                                                    webix.message("Requirement deleted successfully!");
+                                                    this.remove(id);
+                                                })
+                                                .catch((err) => {
+                                                    webix.message({ type: "error", text: "Failed to delete requirement." });
+                                                    console.error("Delete error:", err);
+                                                });
+                                            });
+                                    }
+                            
+                                    return false;
+                                }
+                            },                            
                             on: {
                                 onAfterLoad: function () {
                                     if (!this.count()) {
